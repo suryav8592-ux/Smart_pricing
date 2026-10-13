@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071a35">
+
+    <title>Products | Dynamic Pricing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --navy: #071a35;
+            --cyan: #22d3ee;
+            --surface: #111c30;
+            --border: #263449;
+            --muted: #94a3b8;
+            --text: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        a:focus-visible, button:focus-visible {
+            outline: 3px solid var(--cyan);
+            outline-offset: 4px;
+        }
+
+        .skip-link {
+            position: absolute;
+            z-index: 1100;
+            top: 12px;
+            left: 12px;
+            padding: 10px 16px;
+            transform: translateY(-160%);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .skip-link:focus { transform: translateY(0); }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            padding: 10px max(5%, calc((100% - 1200px) / 2));
+            border-bottom: 1px solid var(--border);
+            background: rgba(7, 26, 53, 0.96);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+            backdrop-filter: blur(12px);
+        }
+
+        .navbar-brand {
+            color: var(--cyan) !important;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            border-radius: 999px;
+            color: #cbd5e1 !important;
+        }
+
+        .nav-link:hover {
+            background: rgba(34, 211, 238, 0.12);
+            color: var(--cyan) !important;
+        }
+
+        main {
+            width: min(100% - 32px, 1200px);
+            margin: 0 auto;
+            padding: clamp(36px, 6vw, 72px) 0;
+        }
+
+        .page-heading {
+            margin-bottom: 26px;
+        }
+
+        .page-heading h1 {
+            color: var(--cyan);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+        }
+
+        .page-heading p { color: var(--muted); }
+
+        .btn-primary {
+            border: 0;
+            background: #0284c7;
+        }
+
+        .btn-primary:hover { background: #0369a1; }
+
+        .table-panel {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--surface);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+        }
+
+        .table {
+            margin: 0;
+            color: var(--text);
+        }
+
+        .table thead th {
+            padding: 16px;
+            border-color: #334155;
+            background: #1e293b;
+            color: var(--cyan);
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 15px 16px;
+            border-color: var(--border);
+            background: var(--surface);
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover td {
+            background: #17263e;
+        }
+
+        .empty-state {
+            padding: 44px 20px !important;
+            color: var(--muted) !important;
+        }
+
+        footer {
+            padding: 24px 16px;
+            border-top: 1px solid var(--border);
+            color: #64748b;
+            text-align: center;
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar { padding: 8px 16px; }
+            .navbar-nav { padding-top: 10px; }
+        }
+
+        @media (max-width: 575.98px) {
+            main { width: min(100% - 24px, 1200px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+{% include 'pricing_app/back_button.html' %}
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-chart-line me-2" aria-hidden="true"></i>Dynamic Pricing
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#mainNavbar" aria-controls="mainNavbar"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+                <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                <!-- <a class="nav-link" href="{% url 'add_product' %}">Add Product</a> -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <header class="page-heading d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1 class="mb-2"><i class="fas fa-boxes-stacked me-2" aria-hidden="true"></i>Products</h1>
+                <p class="mb-0">Manage your products and open a product to compare website prices.</p>
+            </div>
+            <a href="{% url 'add_product' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2" aria-hidden="true"></i>Add Product
+            </a>
+        </header>
+
+        <section class="table-panel" aria-label="Product inventory">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Target Buying Price</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td class="fw-semibold">{{ product.name }}</td>
+                            <td>
+                                {% if product.target_buying_price %}
+                                    ₹{{ product.target_buying_price|floatformat:2 }}
+                                {% else %}
+                                    <span class="text-secondary">Not set</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'product_detail' product.id %}"
+                                   class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-eye me-1" aria-hidden="true"></i>View Details
+                                </a>
+                                <a href="{% url 'edit_product' product.id %}"
+                                   class="btn btn-outline-primary btn-sm">
+                                    Edit
+                                </a>
+                                <a href="{% url 'delete_product' product.id %}"
+                                   class="btn btn-outline-danger btn-sm">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center empty-state">
+                                <i class="fas fa-box-open fa-2x d-block mb-3" aria-hidden="true"></i>
+                                No products yet. Add a product to start managing inventory.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>Dynamic Pricing System · Product inventory</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

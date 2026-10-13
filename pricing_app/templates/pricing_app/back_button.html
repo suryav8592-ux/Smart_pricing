@@ -1,0 +1,31 @@
+<style>
+    .page-back-button {
+        position: fixed;
+        z-index: 1050;
+        right: 1rem;
+        bottom: 1rem;
+        padding: 0.65rem 1rem;
+        border: 1px solid #94a3b8;
+        border-radius: 999px;
+        background: #071a35;
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+    }
+
+    .page-back-button:hover {
+        background: #123f78;
+    }
+
+    .page-back-button:focus-visible {
+        outline: 3px solid #22d3ee;
+        outline-offset: 3px;
+    }
+</style>
+<button class="page-back-button" type="button"
+        aria-label="Go back to the previous page"
+        onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '{% url 'home' %}'; }">
+    Back
+</button>
