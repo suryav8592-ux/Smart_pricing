@@ -1,714 +1,210 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-          content="Explore reinforcement learning-based pricing, product demand, and inventory analysis.">
-    <meta name="theme-color" content="#071a35">
-
-    <title>Dynamic Pricing System</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f1f5f9;
-        }
-
-        /* Navbar */
-
-        .navbar {
-            background: #071a35;
-            padding: 18px 7%;
-        }
-
-        .navbar-brand {
-            color: white !important;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .navbar-brand i {
-            color: #22d3ee;
-        }
-
-        .nav-link {
-            color: white !important;
-            margin-left: 20px;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            color: #22d3ee !important;
-        }
-
-        .register-btn {
-            background: #0891b2;
-            border-radius: 25px;
-            padding: 9px 20px !important;
-        }
-
-        /* Hero Section */
-
-        .hero {
-            background: linear-gradient(135deg, #071a35, #123f78);
-            color: white;
-            padding: 100px 7%;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            font-weight: bold;
-            line-height: 1.3;
-        }
-
-        .hero h1 span {
-            color: #22d3ee;
-        }
-
-        .hero p {
-            color: #cbd5e1;
-            font-size: 18px;
-            line-height: 1.8;
-            margin-top: 20px;
-        }
-
-        /* CTA */
-
-        .cta {
-            background: linear-gradient(135deg, #071a35, #123f78);
-            text-align: center;
-            color: white;
-            padding: 70px 20px;
-        }
-
-        .cta h2 {
-            font-weight: bold;
-            font-size: 35px;
-        }
-
-        .cta p {
-            color: #cbd5e1;
-            margin: 20px 0 30px;
-        }
-
-        /* Footer */
-
-        footer {
-            background: #071a35;
-            color: #cbd5e1;
-            text-align: center;
-            padding: 25px;
-        }
-
-        @media (max-width: 768px) {
-            .hero {
-                padding: 60px 7%;
-                text-align: center;
-            }
-
-            .hero h1 {
-                font-size: 35px;
-            }
-
-        }
-
-        :root {
-            color-scheme: light;
-            scroll-behavior: smooth;
-            --navy: #071a35;
-            --navy-light: #123f78;
-            --cyan: #67e8f9;
-            --blue: #38bdf8;
-            --ink: #0f172a;
-            --muted: #64748b;
-            --surface: #ffffff;
-            --page: #f8fafc;
-        }
-
-        body {
-            background: var(--page);
-            color: var(--ink);
-            line-height: 1.65;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        a {
-            transition: color 180ms ease, background-color 180ms ease,
-                border-color 180ms ease, transform 180ms ease,
-                box-shadow 180ms ease;
-        }
-
-        a:focus-visible,
-        button:focus-visible {
-            outline: 3px solid var(--cyan);
-            outline-offset: 4px;
-        }
-
-        .skip-link {
-            position: absolute;
-            z-index: 1050;
-            top: 12px;
-            left: 12px;
-            padding: 10px 16px;
-            transform: translateY(-160%);
-            border-radius: 8px;
-            background: var(--surface);
-            color: var(--navy);
-            font-weight: 700;
-        }
-
-        .skip-link:focus {
-            transform: translateY(0);
-        }
-
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1020;
-            padding: 12px max(5%, calc((100% - 1320px) / 2));
-            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-            background: rgba(7, 26, 53, 0.9);
-            box-shadow: 0 8px 24px rgba(7, 26, 53, 0.16);
-            backdrop-filter: blur(18px);
-        }
-
-        .navbar-brand {
-            font-size: 1.2rem;
-            letter-spacing: -0.03em;
-            font-weight: 750;
-        }
-
-        .nav-link {
-            margin: 0 3px;
-            padding: 9px 12px !important;
-            border-radius: 999px;
-            color: #dbeafe !important;
-            font-weight: 550;
-        }
-
-        .nav-link:hover,
-        .nav-link:focus-visible {
-            background: rgba(34, 211, 238, 0.12);
-        }
-
-        .register-btn {
-            padding: 9px 16px !important;
-            background: linear-gradient(135deg, #0891b2, #2563eb);
-            box-shadow: 0 6px 18px rgba(8, 145, 178, 0.24);
-        }
-
-        .hero {
-            position: relative;
-            isolation: isolate;
-            overflow: hidden;
-            min-height: min(760px, calc(100vh - 72px));
-            display: flex;
-            align-items: center;
-            padding: clamp(72px, 9vw, 120px) max(5%, calc((100% - 1320px) / 2));
-            background:
-                radial-gradient(ellipse at 80% 35%, rgba(34, 211, 238, 0.2), transparent 35%),
-                radial-gradient(ellipse at 15% 100%, rgba(37, 99, 235, 0.22), transparent 42%),
-                linear-gradient(125deg, #061329 0%, #0b2450 55%, #123f78 100%);
-        }
-
-        .hero::before,
-        .hero::after {
-            position: absolute;
-            z-index: -1;
-            width: 420px;
-            height: 420px;
-            border: 1px solid rgba(103, 232, 249, 0.1);
-            border-radius: 50%;
-            content: "";
-            pointer-events: none;
-        }
-
-        .hero::before {
-            top: -280px;
-            right: 6%;
-            box-shadow: 0 0 0 42px rgba(103, 232, 249, 0.025),
-                0 0 0 84px rgba(103, 232, 249, 0.02);
-        }
-
-        .hero::after {
-            right: 33%;
-            bottom: -370px;
-            width: 520px;
-            height: 520px;
-            border-color: rgba(96, 165, 250, 0.1);
-        }
-
-        .hero h1 {
-            max-width: 720px;
-            margin-top: 20px;
-            font-size: clamp(2.65rem, 5.3vw, 4.65rem);
-            letter-spacing: -0.045em;
-            line-height: 1.04;
-            font-weight: 780;
-        }
-
-        .hero h1 span {
-            display: block;
-            color: var(--cyan);
-        }
-
-        .hero p {
-            max-width: 610px;
-            margin-top: 24px;
-            color: #cbd5e1;
-            font-size: clamp(1rem, 1.5vw, 1.18rem);
-            line-height: 1.8;
-        }
-
-        .hero-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            padding: 8px 13px;
-            border: 1px solid rgba(103, 232, 249, 0.25);
-            border-radius: 999px;
-            background: rgba(8, 145, 178, 0.12);
-            color: #a5f3fc;
-            font-size: 0.84rem;
-            font-weight: 650;
-            letter-spacing: 0.025em;
-        }
-
-        .hero-eyebrow i {
-            color: var(--cyan);
-        }
-
-        .hero-visual {
-            position: relative;
-            margin-left: auto;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 28px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.035));
-            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.32);
-            backdrop-filter: blur(12px);
-            transform: rotate(1deg);
-        }
-
-        .hero-visual::before {
-            position: absolute;
-            z-index: -1;
-            inset: 12% -9% -8% 12%;
-            border-radius: inherit;
-            background: rgba(34, 211, 238, 0.18);
-            filter: blur(40px);
-            content: "";
-        }
-
-        .hero-art {
-            display: block;
-            width: 100%;
-            height: auto;
-            border-radius: 18px;
-        }
-
-        .hero-caption {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 15px 8px 2px;
-            color: #cbd5e1;
-            font-size: 0.86rem;
-        }
-
-        .hero-caption strong {
-            color: #f8fafc;
-            font-size: 0.94rem;
-        }
-
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            color: #a7f3d0;
-            white-space: nowrap;
-        }
-
-        .live-indicator::before {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #34d399;
-            box-shadow: 0 0 12px rgba(52, 211, 153, 0.7);
-            content: "";
-        }
-
-        .cta {
-            position: relative;
-            overflow: hidden;
-            padding: clamp(64px, 8vw, 100px) 20px;
-            background:
-                radial-gradient(ellipse at 50% 0%, rgba(34, 211, 238, 0.18), transparent 45%),
-                linear-gradient(135deg, #061329, #123f78);
-        }
-
-        .cta h2 {
-            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-            font-weight: 750;
-            letter-spacing: -0.035em;
-        }
-
-        .cta .btn {
-            border: 0;
-            background: linear-gradient(135deg, #06b6d4, #2563eb);
-            box-shadow: 0 10px 24px rgba(6, 182, 212, 0.2);
-        }
-
-        .site-footer {
-            background: linear-gradient(180deg, #071a35 0%, #0b1d33 100%);
-            color: #dbeafe;
-            padding: 20px 16px 14px;
-            border-top: 1px solid rgba(125, 211, 252, 0.18);
-        }
-
-        .site-footer .footer-model {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #7dd3fc;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .site-footer .footer-text {
-            margin: 0 auto 10px;
-            text-align: center;
-            color: #dbeafe;
-            max-width: 700px;
-            font-size: 0.95rem;
-        }
-
-        .site-footer .mb-0 {
-            margin: 0;
-            text-align: center;
-            color: #bfdbfe;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 991.98px) {
-            .navbar {
-                padding: 10px 5%;
-            }
-
-            .navbar-nav {
-                align-items: stretch !important;
-                padding: 12px 0 4px;
-            }
-
-            .nav-link {
-                margin: 2px 0;
-            }
-
-            .hero {
-                min-height: auto;
-            }
-
-            .hero-visual {
-                max-width: 560px;
-                margin: 52px auto 0;
-            }
-
-        }
-
-        @media (max-width: 575.98px) {
-            .hero {
-                padding: 64px 6%;
-            }
-
-            .hero h1 {
-                font-size: clamp(2.2rem, 10vw, 3rem);
-            }
-
-            .hero-visual {
-                margin-top: 38px;
-                padding: 10px;
-                border-radius: 20px;
-                transform: none;
-            }
-
-            .hero-caption {
-                align-items: flex-start;
-                flex-direction: column;
-                padding: 12px 5px 2px;
-            }
-
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            :root {
-                scroll-behavior: auto;
-            }
-
-            *,
-            *::before,
-            *::after {
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                scroll-behavior: auto !important;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-{% include 'pricing_app/back_button.html' %}
-
-    <!-- NAVBAR -->
-
-    <a class="skip-link" href="#main-content">Skip to content</a>
-
-    <nav class="navbar navbar-expand-lg navbar-dark" aria-label="Main navigation">
-
-        <div class="container-fluid">
-
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-chart-line"></i>
-                Dynamic Pricing
-            </a>
-
-            <button class="navbar-toggler" type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarMenu">
-
-                <span class="navbar-toggler-icon"></span>
-
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarMenu">
-
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">
-                            <i class="fas fa-home"></i> Home
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Smart Price Catalog | Compare Product Prices Easily{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="py-5" style="background: radial-gradient(circle at 85% 20%, #dbeafe 0%, transparent 40%), linear-gradient(135deg, #f8fafc 0%, #eef5ff 100%);">
+    <div class="container py-4">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-bold mb-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-stars"></i> Intelligent Price Comparison
+                </span>
+                <h1 class="display-4 fw-bolder text-dark mb-3 lh-sm" style="letter-spacing: -1.5px;">
+                    Search Products.<br>
+                    Compare Retailers.<br>
+                    <span class="text-primary">Save Money Today.</span>
+                </h1>
+                <p class="lead text-muted mb-4 pe-lg-4" style="line-height: 1.8;">
+                    Smart Price Catalog brings together offers from top online stores like Amazon, Flipkart, Croma, and Reliance Digital. Browse specific models, compare prices across authorized stores, and buy from the best retailer with one click.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'catalog' %}" class="btn btn-primary-custom px-4 py-3 fs-6">
+                        <i class="bi bi-grid-fill me-2"></i> Browse Product Catalog
+                    </a>
+                    {% if not user.is_authenticated %}
+                        <a href="{% url 'register' %}" class="btn btn-outline-dark px-4 py-3 rounded-3 fw-semibold fs-6">
+                            Create Free Account
                         </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'product_list' %}">
-                            <i class="fas fa-box"></i> Product List
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">
-                            <i class="fas fa-gauge-high"></i> Dashboard
-                        </a>
-                    </li>
-
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link register-btn" href="{% url 'register' %}">
-                                <i class="fas fa-user-plus"></i> Register
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </a>
-                        </li>
                     {% endif %}
-
-                </ul>
-
+                </div>
             </div>
 
-        </div>
+            <div class="col-lg-5 text-center">
+                <div class="position-relative p-2">
+                    <div class="custom-card p-4 p-md-5 text-start bg-white shadow-lg border-0" style="border-radius: 24px;">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">
+                                <i class="bi bi-shield-check me-1"></i> Multi-Store Comparison
+                            </span>
+                            <span class="text-muted small"><i class="bi bi-check-all text-success"></i> Verified Stores</span>
+                        </div>
 
-    </nav>
+                        <div class="text-center my-4 py-4 bg-light rounded-4">
+                            <i class="bi bi-shop-window display-1 text-primary"></i>
+                            <h5 class="fw-bold text-dark mt-3 mb-1">One-Click Retailer Search</h5>
+                            <p class="text-muted small mb-0 px-3">Compare prices across Amazon, Flipkart, Croma, and Reliance Digital</p>
+                        </div>
 
-
-    <!-- HERO SECTION -->
-
-    <main id="main-content">
-
-    <section class="hero">
-
-        <div class="container-fluid">
-
-            <div class="row align-items-center">
-
-                <div class="col-lg-7">
-
-                    <div class="hero-eyebrow">
-                        <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
-                        Compare website prices and buy within budget
-                    </div>
-
-                    <h1>
-                        Product Price
-                        <span>Comparison System</span>
-                    </h1>
-
-                    <p>
-                        Set a target buying price, add offers from different websites,
-                        and quickly identify the lowest price for each product.
-                    </p>
-
-                </div>
-
-                <div class="col-lg-5">
-                    <div class="hero-visual">
-                        <svg class="hero-art" viewBox="0 0 720 430" role="img"
-                             aria-labelledby="pricing-art-title pricing-art-description"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <title id="pricing-art-title">Website price comparison dashboard illustration</title>
-                            <desc id="pricing-art-description">An illustrative dashboard comparing multiple website offers with a target buying price.</desc>
-                            <defs>
-                                <linearGradient id="art-bg" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0" stop-color="#102647"/>
-                                    <stop offset="1" stop-color="#09162d"/>
-                                </linearGradient>
-                                <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0" stop-color="#22d3ee" stop-opacity=".32"/>
-                                    <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
-                                </linearGradient>
-                                <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0" stop-color="#67e8f9"/>
-                                    <stop offset="1" stop-color="#38bdf8"/>
-                                </linearGradient>
-                            </defs>
-                            <rect width="720" height="430" rx="24" fill="url(#art-bg)"/>
-                            <circle cx="636" cy="75" r="108" fill="#0891b2" opacity=".08"/>
-                            <path d="M0 320C130 285 192 382 316 356s224-99 404-53v127H0z" fill="#1d4ed8" opacity=".08"/>
-                            <rect x="30" y="28" width="660" height="48" rx="12" fill="#142b4b"/>
-                            <circle cx="54" cy="52" r="6" fill="#22d3ee"/>
-                            <rect x="70" y="45" width="142" height="13" rx="6.5" fill="#dbeafe" opacity=".86"/>
-                            <rect x="555" y="43" width="90" height="18" rx="9" fill="#0e7490" opacity=".55"/>
-                            <circle cx="570" cy="52" r="4" fill="#67e8f9"/>
-                            <rect x="582" y="48" width="50" height="8" rx="4" fill="#a5f3fc" opacity=".85"/>
-                            <g>
-                                <rect x="30" y="96" width="205" height="91" rx="14" fill="#142b4b" stroke="#294361"/>
-                                <rect x="49" y="114" width="83" height="8" rx="4" fill="#94a3b8" opacity=".78"/>
-                                <rect x="49" y="139" width="94" height="25" rx="6" fill="#f8fafc"/>
-                                <rect x="157" y="139" width="52" height="22" rx="11" fill="#064e3b"/>
-                                <path d="m168 151 5 5 9-11" fill="none" stroke="#6ee7b7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                <rect x="49" y="171" width="69" height="5" rx="2.5" fill="#64748b"/>
-                            </g>
-                            <g>
-                                <rect x="257" y="96" width="205" height="91" rx="14" fill="#142b4b" stroke="#294361"/>
-                                <rect x="276" y="114" width="88" height="8" rx="4" fill="#94a3b8" opacity=".78"/>
-                                <rect x="276" y="139" width="80" height="25" rx="6" fill="#f8fafc"/>
-                                <rect x="367" y="144" width="72" height="14" rx="7" fill="#164e63"/>
-                                <rect x="373" y="148" width="48" height="6" rx="3" fill="#67e8f9"/>
-                                <rect x="276" y="171" width="81" height="5" rx="2.5" fill="#64748b"/>
-                            </g>
-                            <g>
-                                <rect x="484" y="96" width="206" height="91" rx="14" fill="#142b4b" stroke="#294361"/>
-                                <rect x="503" y="114" width="77" height="8" rx="4" fill="#94a3b8" opacity=".78"/>
-                                <rect x="503" y="139" width="82" height="25" rx="6" fill="#f8fafc"/>
-                                <path d="m614 160 10-11 9 5 17-20" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M654 134h-8v8" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                <rect x="503" y="171" width="67" height="5" rx="2.5" fill="#64748b"/>
-                            </g>
-                            <rect x="30" y="207" width="435" height="193" rx="16" fill="#102441" stroke="#294361"/>
-                            <rect x="52" y="226" width="125" height="10" rx="5" fill="#e2e8f0"/>
-                            <rect x="52" y="245" width="88" height="6" rx="3" fill="#64748b"/>
-                            <rect x="371" y="224" width="70" height="24" rx="12" fill="#164e63"/>
-                            <circle cx="384" cy="236" r="4" fill="#67e8f9"/>
-                            <rect x="395" y="232" width="33" height="7" rx="3.5" fill="#a5f3fc"/>
-                            <path d="M60 354H438M60 316H438M60 278H438" stroke="#294361" stroke-width="1"/>
-                            <path d="M60 363 112 344 162 351 215 307 267 319 322 278 374 291 438 264V376H60Z" fill="url(#chart-fill)"/>
-                            <path d="m60 363 52-19 50 7 53-44 52 12 55-41 52 13 64-27" fill="none" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                            <g fill="#102441" stroke="#67e8f9" stroke-width="3">
-                                <circle cx="112" cy="344" r="5"/><circle cx="215" cy="307" r="5"/>
-                                <circle cx="322" cy="278" r="5"/><circle cx="438" cy="264" r="5"/>
-                            </g>
-                            <rect x="485" y="207" width="205" height="193" rx="16" fill="#102441" stroke="#294361"/>
-                            <rect x="505" y="226" width="96" height="10" rx="5" fill="#e2e8f0"/>
-                            <rect x="505" y="247" width="67" height="6" rx="3" fill="#64748b"/>
-                            <circle cx="587" cy="321" r="47" fill="none" stroke="#1e3a5f" stroke-width="14"/>
-                            <circle cx="587" cy="321" r="47" fill="none" stroke="#22d3ee" stroke-width="14" stroke-linecap="round" stroke-dasharray="194 296" transform="rotate(-90 587 321)"/>
-                            <circle cx="587" cy="321" r="47" fill="none" stroke="#818cf8" stroke-width="14" stroke-linecap="round" stroke-dasharray="70 296" stroke-dashoffset="-205" transform="rotate(-90 587 321)"/>
-                            <rect x="505" y="382" width="8" height="8" rx="2" fill="#22d3ee"/>
-                            <rect x="519" y="383" width="48" height="6" rx="3" fill="#94a3b8"/>
-                            <rect x="579" y="382" width="8" height="8" rx="2" fill="#818cf8"/>
-                            <rect x="593" y="383" width="69" height="6" rx="3" fill="#94a3b8"/>
-                        </svg>
-                        <div class="hero-caption">
-                            <strong>Website offers at a glance</strong>
-                            <span class="live-indicator">Compare prices against your target</span>
+                        <div class="d-flex justify-content-around text-center border-top pt-3 text-muted small">
+                            <div>
+                                <i class="bi bi-arrow-down-up text-primary fs-5 d-block mb-1"></i>
+                                <span>Sorted by Price</span>
+                            </div>
+                            <div>
+                                <i class="bi bi-patch-check text-success fs-5 d-block mb-1"></i>
+                                <span>In-Stock Status</span>
+                            </div>
+                            <div>
+                                <i class="bi bi-box-arrow-up-right text-info fs-5 d-block mb-1"></i>
+                                <span>Direct Links</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
 
+<!-- BENEFITS / HOW IT WORKS -->
+<section class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center max-w-xl mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase small">Simple & Powerful</span>
+            <h2 class="fw-bold text-dark mt-1" style="letter-spacing: -0.5px;">How Smart Price Catalog Works</h2>
+            <p class="text-muted">Compare prices in 3 simple steps and never overpay again.</p>
         </div>
 
-    </section>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="custom-card h-100 p-4 border text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-4 mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">1. Search Products</h5>
+                    <p class="text-muted mb-0 small" style="line-height: 1.7;">
+                        Search specifically by product name, brand (Apple, Samsung, Sony), or exact model name.
+                    </p>
+                </div>
+            </div>
 
-    <!-- CALL TO ACTION -->
+            <div class="col-md-4">
+                <div class="custom-card h-100 p-4 border text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-4 mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                        <i class="bi bi-bar-chart-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">2. Compare Offers</h5>
+                    <p class="text-muted mb-0 small" style="line-height: 1.7;">
+                        Click "Compare Prices" to see all verified store offers sorted from lowest to highest.
+                    </p>
+                </div>
+            </div>
 
-    <section class="cta">
+            <div class="col-md-4">
+                <div class="custom-card h-100 p-4 border text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-4 mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                        <i class="bi bi-cart-check-fill"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">3. Buy at Best Price</h5>
+                    <p class="text-muted mb-0 small" style="line-height: 1.7;">
+                        Click "Visit Store" to go directly to the verified store and purchase at the lowest price.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        <div class="container">
-
-            <h2>Ready to Find the Best Price?</h2>
-
-            <p>
-                Create an account to compare website offers against your budget.
-            </p>
-
-            <a href="{% url 'register' %}"
-               class="btn btn-info btn-lg rounded-pill px-4">
-
-                Create Account
-                <i class="fas fa-arrow-right ms-2"></i>
-
+<!-- FEATURED PRODUCTS PREVIEW (No best price shown before clicking Compare Prices) -->
+{% if featured_products %}
+<section class="py-5" style="background-color: #f8fafc;">
+    <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <span class="text-primary fw-bold text-uppercase small">Top Picks</span>
+                <h3 class="fw-bold text-dark mt-1 mb-0">Featured Products</h3>
+            </div>
+            <a href="{% url 'catalog' %}" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold">
+                View All <i class="bi bi-arrow-right"></i>
             </a>
-
         </div>
 
-    </section>
+        <div class="row g-4">
+            {% for product in featured_products %}
+            <div class="col-sm-6 col-md-4 col-lg-4">
+                <div class="product-card">
+                    <!-- FIXED UNIFORM IMAGE BOX -->
+                    <div class="product-img-box">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <div class="text-muted text-center">
+                                <i class="bi bi-box-seam display-4 text-secondary opacity-50"></i>
+                            </div>
+                        {% endif %}
 
-    </main>
+                        {% if product.category %}
+                            <span class="position-absolute top-0 end-0 m-2 badge-category">
+                                {{ product.category }}
+                            </span>
+                        {% endif %}
+                    </div>
 
-    <!-- FOOTER -->
+                    <!-- STANDARDIZED CARD BODY -->
+                    <div class="product-card-body">
+                        <div class="product-card-brand">
+                            <span class="badge-brand">{{ product.brand }}</span>
+                        </div>
 
-    <footer class="site-footer">
-        <div class="footer-model">
-            <i class="fas fa-brain"></i>
-            Product Price Comparison
+                        <h3 class="product-card-title">
+                            <a href="{% url 'product_detail' product.id %}">
+                                {{ product.name }}
+                            </a>
+                        </h3>
+
+                        <div class="product-card-model" title="{{ product.model_name }}">
+                            Model: <span class="text-dark">{{ product.model_name }}</span>
+                        </div>
+
+                        <p class="product-card-desc">
+                            {{ product.description|default:"Compare prices across authorized retailer stores." }}
+                        </p>
+
+                        <div class="product-card-actions">
+                            <a href="{% url 'price_comparison' product.id %}" class="btn btn-primary-custom w-100 py-2">
+                                Compare Prices <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
+    </div>
+</section>
+{% endif %}
 
-        <p class="footer-text">
-            Compare website prices, find the lowest offer, and check it against your target.
+<!-- CTA SECTION -->
+<section class="py-5" style="background: linear-gradient(135deg, #172554 0%, #1e40af 100%); color: white;">
+    <div class="container py-4 text-center">
+        <h2 class="display-6 fw-bold mb-3">Ready to compare prices and save?</h2>
+        <p class="lead text-light mb-4 mx-auto" style="max-width: 600px;">
+            Browse our full catalog of products, compare live prices from top stores, and find the best deals today.
         </p>
-
-        <p class="mb-0">
-            © 2026 Product Price Comparison System | Developed using Python and Django
-        </p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-    </script>
-
-</body>
-</html>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'catalog' %}" class="btn btn-light btn-lg px-4 fw-bold text-primary">
+                <i class="bi bi-grid-fill me-1"></i> Browse Catalog Now
+            </a>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4 fw-semibold">
+                    Register Free
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

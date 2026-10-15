@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Catalog | Smart Price Catalog{% endblock %}
+
+{% block content %}
+<!-- PAGE HEADER -->
+<div class="py-4 bg-white border-bottom">
+    <div class="container">
+        <div class="row align-items-center gy-3">
+            <div class="col-md-7">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Product Catalog</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bolder text-dark mb-0" style="letter-spacing: -0.5px;">
+                    {% if category_filter %}{{ category_filter }}{% else %}Product Catalog{% endif %}
+                </h2>
+                <p class="text-muted small mb-0 mt-1">Browse products and compare prices across online retailers.</p>
+            </div>
+            <div class="col-md-5 text-md-end">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold">
+                    <i class="bi bi-box-seam me-1"></i> <strong>{{ products.count }}</strong> Products Available
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- SEARCH & CATEGORY PILLS BAR -->
+    <div class="custom-card p-3 p-md-4 mb-4 bg-white">
+        <form method="GET" action="{% url 'catalog' %}" class="mb-3">
+            <div class="row g-2">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" 
+                               name="q" 
+                               class="form-control border-start-0 bg-light py-2" 
+                               placeholder="Search by product name, brand (Apple, Samsung, Sony), or model..." 
+                               value="{{ query }}"
+                               id="searchInput">
+                        {% if query %}
+                            <a href="{% url 'catalog' %}{% if category_filter %}?category={{ category_filter }}{% endif %}" class="btn btn-outline-secondary border-start-0" title="Clear search">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary-custom py-2">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                </div>
+            </div>
+            {% if category_filter %}
+                <input type="hidden" name="category" value="{{ category_filter }}">
+            {% endif %}
+        </form>
+
+        <!-- CATEGORY PILL TABS -->
+        <div class="d-flex align-items-center gap-2 overflow-auto pb-1 pt-1" style="scrollbar-width: thin;">
+            <span class="small fw-bold text-muted text-uppercase me-1" style="font-size: 0.75rem;">Categories:</span>
+            <a href="{% url 'catalog' %}{% if query %}?q={{ query }}{% endif %}" 
+               class="category-pill {% if not category_filter %}active{% endif %}">
+                All Products ({{ total_count }})
+            </a>
+            {% for cat in categories %}
+                <a href="{% url 'catalog' %}?category={{ cat|urlencode }}{% if query %}&q={{ query }}{% endif %}" 
+                   class="category-pill {% if category_filter == cat %}active{% endif %}">
+                    {{ cat }}
+                </a>
+            {% endfor %}
+        </div>
+
+        {% if query or category_filter %}
+            <div class="mt-3 pt-2 border-top d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span class="small text-muted">
+                    Filtered by: 
+                    {% if query %}<strong>Search: "{{ query }}"</strong>{% endif %}
+                    {% if category_filter %}<strong>Category: {{ category_filter }}</strong>{% endif %}
+                </span>
+                <a href="{% url 'catalog' %}" class="small text-danger text-decoration-none fw-semibold">
+                    <i class="bi bi-x-circle-fill me-1"></i> Reset all filters
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- EQUAL-SIZE PRODUCT CARDS GRID -->
+    <div class="row g-4">
+        {% for product in products %}
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                <div class="product-card">
+                    <!-- FIXED UNIFORM IMAGE BOX -->
+                    <div class="product-img-box">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <div class="text-muted text-center">
+                                <i class="bi bi-box-seam display-4 text-secondary opacity-50"></i>
+                            </div>
+                        {% endif %}
+
+                        {% if product.category %}
+                            <span class="position-absolute top-0 end-0 m-2 badge-category">
+                                {{ product.category }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- STANDARDIZED CARD BODY -->
+                    <div class="product-card-body">
+                        <!-- BRAND LINE (Fixed height 24px) -->
+                        <div class="product-card-brand">
+                            <span class="badge-brand">{{ product.brand }}</span>
+                        </div>
+
+                        <!-- PRODUCT TITLE (Fixed height 2.6rem, 2-line clamp) -->
+                        <h3 class="product-card-title">
+                            <a href="{% url 'product_detail' product.id %}">
+                                {{ product.name }}
+                            </a>
+                        </h3>
+
+                        <!-- MODEL NAME (Fixed height 1.3rem, 1-line clamp) -->
+                        <div class="product-card-model" title="{{ product.model_name }}">
+                            Model: <span class="text-dark">{{ product.model_name }}</span>
+                        </div>
+
+                        <!-- DESCRIPTION (Fixed height 2.7rem, 2-line clamp) -->
+                        <p class="product-card-desc">
+                            {{ product.description|default:"Compare prices across authorized retailer stores." }}
+                        </p>
+
+                        <!-- ACTION BUTTONS (Pinned to the bottom of every card) -->
+                        <div class="product-card-actions">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'price_comparison' product.id %}" class="btn btn-primary-custom py-2">
+                                    <i class="bi bi-bar-chart-fill me-1"></i> Compare Prices
+                                </a>
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary btn-sm py-1 rounded-2">
+                                    Product Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="custom-card p-5 text-center bg-white my-4">
+                    <div class="display-3 text-muted mb-3 opacity-50">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">No Products Found</h3>
+                    <p class="text-muted max-w-md mx-auto mb-4">
+                        {% if query %}
+                            We couldn't find any products matching "<strong>{{ query }}</strong>". Try searching for another brand or model name.
+                        {% elif category_filter %}
+                            There are currently no products in the <strong>{{ category_filter }}</strong> category.
+                        {% else %}
+                            No products are currently in the catalog.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'catalog' %}" class="btn btn-primary-custom px-4">
+                        View All Products
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

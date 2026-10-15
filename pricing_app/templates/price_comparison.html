@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Compare Prices: {{ product.brand }} {{ product.name }} ({{ product.model_name }}){% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'catalog' %}" class="text-decoration-none">Catalog</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Price Comparison</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-1">
+                    {{ product.brand }}
+                </span>
+                <h1 class="h2 fw-bolder text-dark mb-1">
+                    {{ product.name }}
+                </h1>
+                <p class="text-secondary mb-0 fw-medium">
+                    Model: <span class="text-dark fw-bold">{{ product.model_name }}</span>
+                    {% if product.category %}
+                        <span class="mx-2 text-muted">&bull;</span> Category: <span class="badge bg-light text-secondary border">{{ product.category }}</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'catalog' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Catalog
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- PRODUCT SUMMARY & LOWEST DEAL BANNER -->
+    <div class="row g-4 mb-4">
+        <!-- PRODUCT QUICK CARD -->
+        <div class="col-lg-4 col-md-5">
+            <div class="custom-card p-4 bg-white text-center h-100">
+                <div class="p-3 bg-light rounded-3 mb-3 d-flex align-items-center justify-content-center" style="min-height: 220px;">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 200px; object-fit: contain;">
+                    {% else %}
+                        <i class="bi bi-box-seam display-2 text-secondary opacity-50"></i>
+                    {% endif %}
+                </div>
+
+                <h5 class="fw-bold mb-1">{{ product.brand }} {{ product.name }}</h5>
+                <p class="text-muted small mb-3">Model: {{ product.model_name }}</p>
+
+                {% if product.description %}
+                    <div class="p-3 bg-light rounded-3 text-start mb-3">
+                        <small class="fw-bold text-secondary text-uppercase d-block mb-1" style="font-size: 0.75rem;">Description</small>
+                        <p class="small text-muted mb-0" style="line-height: 1.6;">
+                            {{ product.description }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary btn-sm w-100">
+                    <i class="bi bi-info-circle me-1"></i> Full Product Specifications
+                </a>
+            </div>
+        </div>
+
+        <!-- OFFERS COMPARISON SECTION -->
+        <div class="col-lg-8 col-md-7">
+            <!-- BEST DEAL ALERT -->
+            {% if lowest_offer %}
+                <div class="custom-card p-4 mb-4 border-primary bg-primary-subtle text-dark border">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                        <div>
+                            <span class="badge bg-success text-white fw-bold px-3 py-1 rounded-pill mb-2">
+                                <i class="bi bi-check2-circle me-1"></i> Lowest Price Offer
+                            </span>
+                            <h3 class="fw-bolder text-dark mb-0">
+                                ₹{{ lowest_offer.price }}
+                                <small class="fs-6 fw-normal text-muted">on {{ lowest_offer.platform_name }}</small>
+                            </h3>
+                            <small class="text-muted">
+                                Status: <span class="text-success fw-bold">{{ lowest_offer.availability }}</span>
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{{ lowest_offer.product_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary-custom px-4 py-2">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Buy at Lowest Price
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- ALL RETAILER OFFERS LIST -->
+            <div class="custom-card p-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold text-dark mb-0 fs-5">
+                        <i class="bi bi-shop me-2 text-primary"></i> All Available Retailer Offers
+                    </h4>
+                    <span class="badge bg-light text-muted border">
+                        Sorted: Lowest to Highest Price
+                    </span>
+                </div>
+
+                {% if offers %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" style="min-width: 160px;">Retailer / Store</th>
+                                    <th scope="col">Price (INR)</th>
+                                    <th scope="col">Stock Status</th>
+                                    <th scope="col" class="d-none d-md-table-cell">Last Updated</th>
+                                    <th scope="col" class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for offer in offers %}
+                                    <tr {% if offer == lowest_offer %}class="table-primary-subtle"{% endif %}>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if offer.platform_image %}
+                                                    <img src="{{ offer.platform_image.url }}" alt="{{ offer.platform_name }}" style="width: 32px; height: 32px; object-fit: contain;" class="rounded border p-1 bg-white">
+                                                {% else %}
+                                                    <span class="badge bg-primary text-white rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                        <i class="bi bi-bag"></i>
+                                                    </span>
+                                                {% endif %}
+                                                <div>
+                                                    <span class="fw-bold text-dark d-block">{{ offer.platform_name }}</span>
+                                                    {% if offer == lowest_offer %}
+                                                        <span class="badge bg-success-subtle text-success small" style="font-size: 0.7rem;">Lowest Price</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bolder text-primary fs-5">₹{{ offer.price }}</span>
+                                        </td>
+                                        <td>
+                                            {% if offer.availability|lower == 'available' %}
+                                                <span class="badge-available">
+                                                    <i class="bi bi-check-circle-fill"></i> In Stock
+                                                </span>
+                                            {% else %}
+                                                <span class="badge-outofstock">
+                                                    <i class="bi bi-x-circle-fill"></i> Out of Stock
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="d-none d-md-table-cell text-muted small">
+                                            {{ offer.last_updated|date:"d M Y, H:i" }}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ offer.product_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-navy-custom btn-sm px-3 text-nowrap">
+                                                Visit Store <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <!-- EMPTY STATE: NO OFFERS -->
+                    <div class="text-center py-5">
+                        <div class="display-3 text-muted mb-3 opacity-50">
+                            <i class="bi bi-tags"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark">No Price Offers Currently Listed</h4>
+                        <p class="text-muted mx-auto mb-4" style="max-width: 450px;">
+                            There are currently no store offers listed for <strong>{{ product.brand }} {{ product.name }} ({{ product.model_name }})</strong>.
+                            Store offers are updated regularly by our catalog administrators.
+                        </p>
+                        <a href="{% url 'catalog' %}" class="btn btn-primary-custom px-4">
+                            <i class="bi bi-arrow-left me-1"></i> Browse Other Products
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- DISCLAIMER NOTE -->
+            <div class="mt-3 p-3 bg-white rounded-3 border text-muted small">
+                <i class="bi bi-info-circle text-primary me-1"></i>
+                <strong>Note:</strong> Prices and availability are maintained and verified by catalog administrators. Always check the retailer's checkout page for the final price and applicable bank offers.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
